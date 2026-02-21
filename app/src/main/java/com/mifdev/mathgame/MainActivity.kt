@@ -41,9 +41,14 @@ class MainActivity : AppCompatActivity() {
         // ID suara - pastikan file button_click.mp3 ada di res/raw
         clickSoundId = soundPool?.load(this, R.raw.button_click, 1) ?: 0
 
-        // Inisialisasi MediaPlayer untuk musik latar - pastikan background_music.mp3 ada di res/raw
-        mediaPlayer = MediaPlayer.create(this, R.raw.background_music)
-        mediaPlayer?.isLooping = true // Musik berulang
+        // Inisialisasi MediaPlayer untuk musik latar - pastikan background_music.wav ada di res/raw
+        // Gunakan try-catch agar aplikasi tidak crash jika file tidak terbaca
+        try {
+            mediaPlayer = MediaPlayer.create(this, R.raw.background_music)
+            mediaPlayer?.isLooping = true // Musik berulang
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         addition = findViewById(R.id.buttonAdd)
         subtraction = findViewById(R.id.buttonSub)
@@ -84,13 +89,21 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // Mulai musik saat aplikasi dibuka/kembali
-        mediaPlayer?.start()
+        try {
+            mediaPlayer?.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onPause() {
         super.onPause()
         // Jeda musik saat aplikasi di latar belakang
-        mediaPlayer?.pause()
+        try {
+            mediaPlayer?.pause()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onDestroy() {
