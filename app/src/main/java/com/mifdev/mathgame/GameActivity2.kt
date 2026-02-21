@@ -60,23 +60,24 @@ class GameActivity2 : AppCompatActivity() {
 
                 pauseTimer()
 
-                val userAnswer = input.toInt()
+                try {
+                    val userAnswer = input.toInt()
 
-                if (userAnswer == correctAnswer)
-                {
-
-                    userScore += 10
-                    textQuestion.text = "Congratulations! Your answer is correct."
-                    textScore.text = userScore.toString()
-
-                }
-                else
-                {
-
-                    userLife -= 1
-                    textQuestion.text = "Sorry! Your answer is wrong."
-                    textLife.text = userLife.toString()
-
+                    if (userAnswer == correctAnswer)
+                    {
+                        userScore += 10
+                        textQuestion.text = "Congratulations! Your answer is correct."
+                        textScore.text = userScore.toString()
+                    }
+                    else
+                    {
+                        userLife -= 1
+                        textQuestion.text = "Sorry! Your answer is wrong."
+                        textLife.text = userLife.toString()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(applicationContext, "Invalid input!", Toast.LENGTH_SHORT).show()
+                    startTimer()
                 }
 
             }
@@ -89,7 +90,7 @@ class GameActivity2 : AppCompatActivity() {
 
             editTextAnswer.setText("")
 
-            if (userLife == 0)
+            if (userLife <= 0)
             {
 
                 Toast.makeText(applicationContext, "Game Over!", Toast.LENGTH_LONG).show()
@@ -112,8 +113,15 @@ class GameActivity2 : AppCompatActivity() {
 
     fun gameContinue()
     {
-        val number1 = Random.nextInt(0,100)
-        val number2 = Random.nextInt(0,100)
+        var number1 = Random.nextInt(0,100)
+        var number2 = Random.nextInt(0,100)
+
+        // Pastikan number1 lebih besar dari number2 agar tidak negatif
+        if (number1 < number2) {
+            val temp = number1
+            number1 = number2
+            number2 = temp
+        }
 
         textQuestion.text = "$number1 - $number2"
 
@@ -157,7 +165,9 @@ class GameActivity2 : AppCompatActivity() {
 
     fun pauseTimer()
     {
-        timer.cancel()
+        if (::timer.isInitialized) {
+            timer.cancel()
+        }
     }
 
     fun resetTimer()

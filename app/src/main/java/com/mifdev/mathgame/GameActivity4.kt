@@ -35,7 +35,7 @@ class GameActivity4 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game2)
 
-        supportActionBar!!.title = "Distribution"
+        supportActionBar!!.title = "Division"
 
         textScore = findViewById(R.id.textViewScore)
         textLife = findViewById(R.id.textViewLife)
@@ -60,85 +60,71 @@ class GameActivity4 : AppCompatActivity() {
 
                 pauseTimer()
 
-                val userAnswer = input.toInt()
+                try {
+                    val userAnswer = input.toInt()
 
-                if (userAnswer == correctAnswer)
-                {
-
-                    userScore += 10
-                    textQuestion.text = "Congratulations! Your answer is correct."
-                    textScore.text = userScore.toString()
-
+                    if (userAnswer == correctAnswer)
+                    {
+                        userScore += 10
+                        textQuestion.text = "Congratulations! Your answer is correct."
+                        textScore.text = userScore.toString()
+                    }
+                    else
+                    {
+                        userLife -= 1
+                        textQuestion.text = "Sorry! Your answer is wrong."
+                        textLife.text = userLife.toString()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(applicationContext, "Invalid input!", Toast.LENGTH_SHORT).show()
+                    startTimer() // Resume timer if input invalid
                 }
-                else
-                {
-
-                    userLife -= 1
-                    textQuestion.text = "Sorry! Your answer is wrong."
-                    textLife.text = userLife.toString()
-
-                }
-
             }
-
         }
-        buttonNext.setOnClickListener {
 
+        buttonNext.setOnClickListener {
             pauseTimer()
             resetTimer()
-
             editTextAnswer.setText("")
 
-            if (userLife == 0)
+            if (userLife <= 0)
             {
-
                 Toast.makeText(applicationContext, "Game Over!", Toast.LENGTH_LONG).show()
                 val intent = Intent(this@GameActivity4,ResultActivity::class.java)
                 intent.putExtra("score",userScore)
                 startActivity(intent)
                 finish()
-
             }
             else
             {
-
                 gameContinue()
-
             }
-
         }
-
     }
 
     fun gameContinue()
     {
-        val number1 = Random.nextInt(0,100)
-        var number2 = Random.nextInt(0,100)
+        // Logika agar hasil pembagian selalu bulat:
+        // 1. Acak angka pembagi (divisor)
+        val divisor = Random.nextInt(1, 20) // Angka pembagi antara 1-19
+        // 2. Acak hasil bagi (correctAnswer)
+        correctAnswer = Random.nextInt(1, 50) // Hasil bagi antara 1-49
+        // 3. Kalikan keduanya untuk mendapatkan angka pertama
+        val dividend = divisor * correctAnswer
 
-        while (number2 == 0) { // Ensure number2 is not zero
-            number2 = Random.nextInt(0, 100)
-        }
-
-        textQuestion.text = "$number1 / $number2"
-        correctAnswer = number1 / number2
-
+        textQuestion.text = "$dividend / $divisor"
         startTimer()
-
     }
 
     fun startTimer()
     {
-
         timer = object : CountDownTimer(timeLeftInMillis,1000){
             override fun onTick(millisUntilFinished: Long) {
-
                 timeLeftInMillis = millisUntilFinished
                 updateText()
-
             }
 
             override fun onFinish() {
-
                 pauseTimer()
                 resetTimer()
                 updateText()
@@ -146,9 +132,7 @@ class GameActivity4 : AppCompatActivity() {
                 userLife--
                 textLife.text = userLife.toString()
                 textQuestion.text = "Sorry! Your time is up."
-
             }
-
         }.start()
     }
 
@@ -160,7 +144,9 @@ class GameActivity4 : AppCompatActivity() {
 
     fun pauseTimer()
     {
-        timer.cancel()
+        if (::timer.isInitialized) {
+            timer.cancel()
+        }
     }
 
     fun resetTimer()
@@ -168,5 +154,4 @@ class GameActivity4 : AppCompatActivity() {
         timeLeftInMillis = startTimerInMillis
         updateText()
     }
-
 }
